@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use indexmap::IndexMap;
 use nvml_wrapper::enums::device::UsedGpuMemory::Used;
 use nvml_wrapper::NVML;
+use std::ffi::OsStr;
 use sysinfo::{Pid, PidExt, System, SystemExt};
 
 fn print_gpu_mem_usage(idx: u32, nvml: &NVML, sys: &mut System) -> Result<()> {
@@ -42,7 +43,10 @@ fn print_gpu_mem_usage(idx: u32, nvml: &NVML, sys: &mut System) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let nvml = NVML::init().context("unable to initialize NVIDIA Management Library (NVML)")?;
+    let nvml = NVML::builder()
+        .lib_path(OsStr::new("libnvidia-ml.so.1"))
+        .init()
+        .context("unable to initialize NVIDIA Management Library (NVML)")?;
     let gpu_count = nvml.device_count()?;
     let mut s = System::new();
     for idx in 0..gpu_count {
