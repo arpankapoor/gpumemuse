@@ -1,11 +1,11 @@
 use anyhow::{Context, Result};
 use indexmap::IndexMap;
 use nvml_wrapper::enums::device::UsedGpuMemory::Used;
-use nvml_wrapper::NVML;
+use nvml_wrapper::Nvml;
 use std::ffi::OsStr;
 use sysinfo::{Pid, PidExt, System, SystemExt};
 
-fn print_gpu_mem_usage(idx: u32, nvml: &NVML, sys: &mut System) -> Result<()> {
+fn print_gpu_mem_usage(idx: u32, nvml: &Nvml, sys: &mut System) -> Result<()> {
     print!("{}: ", idx);
     let device = nvml.device_by_index(idx)?;
     let meminfo = device.memory_info()?;
@@ -43,7 +43,7 @@ fn print_gpu_mem_usage(idx: u32, nvml: &NVML, sys: &mut System) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let nvml = NVML::builder()
+    let nvml = Nvml::builder()
         .lib_path(OsStr::new("libnvidia-ml.so.1"))
         .init()
         .context("unable to initialize NVIDIA Management Library (NVML)")?;
